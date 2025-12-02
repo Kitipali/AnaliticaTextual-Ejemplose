@@ -11,35 +11,13 @@ import numpy as np
 import pandas as pd
 import os
 import regex
-import es_core_news_sm # carga el modelo en español de Spacy
+import es_core_news_sm
 from sklearn.feature_extraction.text import TfidfVectorizer
 from string import punctuation
 from spacy.lang.es.stop_words import STOP_WORDS
 import matplotlib.pyplot as plt
 import joblib
 
-nlp = es_core_news_sm.load()
-"""
-Te da un Doc, que contiene:
-
-doc[0] → primer token
-
-doc[0].text → texto
-
-doc[0].lemma_ → lema
-
-doc[0].pos_ → categoría gramatical
-
-doc[0].dep_ → dependencia
-
-doc.ents → entidades del texto
-
-doc.sents → oraciones
-
-etc.
-
-Es literalmente EL corazón de spaCy.
-"""
 def ConvertirAcentos(texto):
     texto=texto.replace("\xc3\xa1","á")
     texto=texto.replace("\xc3\xa9","é")   
@@ -117,28 +95,8 @@ def CargarModelo(NombreModelo):
 
 
 def EliminaNumeroYPuntuacion(oracion):
-    string_numeros = regex.sub(r'[\”\“\¿\°\d]','', oracion)
-    return ''.join(c for c in string_numeros if c not in punctuation) 
-    #Recorre cada carácter c de string_numeros y se queda SOLO con los que NO estén en punctuation.
-    #como ese recorrido es por caracter, es necesario juntarlos (join) sin espacios "", ya que los propios espacios no se han borrado porque no están en la lusta punctuation 
-
-"""
-Esta expresión regular busca dentro del texto:
-
-\d → cualquier número (0–9)
-
-\” → comillas especiales (Unicode)
-
-\“ → comillas de apertura
-
-\¿ → signo de interrogación inicial
-
-\° → símbolo de grados
-
-+ → este "+" está mal puesto dentro del set, lo comentamos luego
-
-Todo lo que coincide con eso lo reemplaza por '' (carácter nulo).
-"""
+    string_numeros = regex.sub(r'[\”\“\¿\°\d+]','', oracion)
+    return ''.join(c for c in string_numeros if c not in punctuation)
 
 
 def Lematizar(oracion):
@@ -146,7 +104,7 @@ def Lematizar(oracion):
    lemas = [token.lemma_ for token in doc]
    return(Lista_a_Oracion(lemas))  
   
-def Lista_a_Oracion(Lista): #Convierte una lista de palabras en una oración uniendo cada token con un espacio.
+def Lista_a_Oracion(Lista):
    return(" ".join(Lista))          
 
 def EliminarStopwords(oracion):
@@ -154,19 +112,19 @@ def EliminarStopwords(oracion):
     oracion_filtrada =[] 
     for palabra in Tokens:
        if palabra not in STOP_WORDS:
-           palabra_limpia = palabra.rstrip() #rstrip() ->elimina espacios en blanco al final de la palabra.
+           palabra_limpia = palabra.rstrip()
            if len(palabra_limpia)!=0:
               oracion_filtrada.append(palabra_limpia) 
     return(Lista_a_Oracion(oracion_filtrada))
 
 def Tokenizar(oracion):
-    doc = nlp(oracion) # Pasa ete exto por el modelo spacy en español
-    tokens = [palabra.text for palabra in doc] #Recorre cada token (palabra) dentro del documento spaCy (doc), extrae el atributo .text (su contenido original).
+    doc = nlp(oracion)
+    tokens = [palabra.text for palabra in doc]
     return(tokens)
 
 
 def Etiquetar(texto):
-   doc = nlp(texto) 
+   doc = nlp(texto)
    Etiquetado = ''.join(t.text+"/"+t.pos_+" " for t in doc)
    return(Etiquetado.rstrip())
 
