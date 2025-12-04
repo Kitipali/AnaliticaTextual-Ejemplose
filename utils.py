@@ -17,6 +17,9 @@ from string import punctuation
 from spacy.lang.es.stop_words import STOP_WORDS
 import matplotlib.pyplot as plt
 import joblib
+from nltk.stem import SnowballStemmer
+
+stemmer = SnowballStemmer("spanish")
 
 nlp = es_core_news_sm.load()
 """
@@ -135,16 +138,20 @@ Esta expresión regular busca dentro del texto:
 
 \° → símbolo de grados
 
-+ → este "+" está mal puesto dentro del set, lo comentamos luego
 
 Todo lo que coincide con eso lo reemplaza por '' (carácter nulo).
 """
 
 
-def Lematizar(oracion):
-   doc = nlp(oracion)
-   lemas = [token.lemma_ for token in doc]
-   return(Lista_a_Oracion(lemas))  
+def Lematizar(oracion): #Consiste en convertir cada palabra a su forma base o lema. Corriendo ->correr, habló -> hablar, fue -> ser
+   doc = nlp(oracion)  # Pasa este exto por el pipeline del modelo spacy en español. En spacy no hace falyta tokenizar previamnete
+   lemas = [token.lemma_ for token in doc] # Esto es una list comprehension que recorre cada token del documento y lo convierte en su forma base (lema)
+   return(Lista_a_Oracion(lemas))   # para VOLVER a convertir esa lista en una cadena.
+
+def Reducir(oracion):
+    tokens = Tokenizar(oracion)
+    stems = [stemmer.stem(palabra) for palabra in tokens] #aquí usa snowball -> necesita tokenizar previamnete
+    return Lista_a_Oracion(stems)
   
 def Lista_a_Oracion(Lista): #Convierte una lista de palabras en una oración uniendo cada token con un espacio.
    return(" ".join(Lista))          
@@ -160,17 +167,36 @@ def EliminarStopwords(oracion):
     return(Lista_a_Oracion(oracion_filtrada))
 
 def Tokenizar(oracion):
-    doc = nlp(oracion) # Pasa ete exto por el modelo spacy en español
+    doc = nlp(oracion) # Pasa este exto por el modelo spacy en español
     tokens = [palabra.text for palabra in doc] #Recorre cada token (palabra) dentro del documento spaCy (doc), extrae el atributo .text (su contenido original).
     return(tokens)
 
 
 def Etiquetar(texto):
-   doc = nlp(texto) 
-   Etiquetado = ''.join(t.text+"/"+t.pos_+" " for t in doc)
-   return(Etiquetado.rstrip())
+   doc = nlp(texto) # genera una lista de objetos Token -> varios atributos. Entre ellos .text(el texto) y .pos_(Categoría gramatical)
+   Etiquetado = ''.join(t.text+"/"+t.pos_+" " for t in doc) #generamos un string texto de cada token + / + su categoría gramatical. Este string termina con un espacio extra al final
+   return(Etiquetado.rstrip()) #.rstrip elimia ese espacio extra del final
+"""
+La salida sería de este tipo -> El/DET perro/NOUN corre/VERB rápido/ADV ./PUNCT
 
+"""
 
+def Etiquetar2(texto):
+    doc = nlp(texto) # genera una lista de objetos Token -> varios atributos. Entre ellos .text(el texto) y .pos_(Categoría gramatical)
+    etiquetado = [(token.text, token.pos_) for token in doc] #genera una lista de tuplas, donde cada elemento es (token.text, token.pos_) 
+    return etiquetado
+
+"""
+La salida sería de este tipo -> Devuelve una lista de tuplas:
+[
+ ('El', 'DET'),
+ ('perro', 'NOUN'),
+ ('corre', 'VERB'),
+ ('rápido', 'ADV'),
+ ('.', 'PUNCT')
+]
+
+"""
 def GraficarVectores(vocab,vectores):
     x = []
     y = []

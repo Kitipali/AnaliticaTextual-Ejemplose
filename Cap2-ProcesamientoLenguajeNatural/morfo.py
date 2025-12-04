@@ -37,6 +37,7 @@ def PreProcesamiento(oraciones):
     return(texto_limpio)
 
 
+
 def Reducir(oracion): 
    tokens = Tokenizar(oracion)
    stems = [stemmer.stem(palabra) for palabra in tokens]

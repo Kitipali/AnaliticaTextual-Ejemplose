@@ -12,7 +12,7 @@ execfile('E:/JOHN/BOOK/SPANISH/TextAnalytics-Examples/utils.py')
 
 
 from nltk.chunk import RegexpParser as RE_Parser
-import es_core_news_sm
+import es_core_news_sm 
 
 
 
