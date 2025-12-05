@@ -13,7 +13,7 @@
 from past.builtins import execfile
 execfile('E:/JOHN/BOOK/SPANISH/TextAnalytics-Examples/utils.py')
 
-import es_core_news_sm # # procesador de lenguaje con segmentación de frases, tokenización, lematización, etiquetas POS y dependencias sintácticas. Carga el modelo en español de Spacy
+import es_core_news_sm
 from spacy import displacy
           
            
