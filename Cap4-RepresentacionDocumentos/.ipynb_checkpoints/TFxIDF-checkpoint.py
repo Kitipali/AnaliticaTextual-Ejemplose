@@ -14,15 +14,10 @@ execfile('E:/JOHN/BOOK/SPANISH/TextAnalytics-Examples/utils.py')
 from sklearn.feature_extraction.text import TfidfVectorizer
 from scipy.spatial.distance import cosine
 
-# Con la función CrearQuery se prentende
-    # Construir un vector TF-IDF para una consulta (query) usando el vocabulario entrenado previamente.
-    # Si tengo un vocabulario como {"chile":0, "corea":1, "kpop":2, "idol":3, "fan":4} y el usario escribe "fan de kpop" -> La función generará un vector de la query: [0, 0, 1, 0, 1] * idf
-    # bPara luego compararlo con otros documentos mediante coseno.
-
 
 def crearQuery(terms,idf,vocabulario):
-    query = np.zeros(len(vocabulario)) #Crea el vector de ceros del tamaño del vocabulario
-    listaTerminos = Tokenizar(Lematizar(terms)) #lematiza y tokenizar -> creando una lista de tokens
+    query = np.zeros(len(vocabulario))
+    listaTerminos = Tokenizar(Lematizar(terms))
     for t in listaTerminos:      
        try:
            indice = vocabulario[t]
